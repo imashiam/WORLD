@@ -229,7 +229,7 @@ function create_config( )
     "msg_checks",
     "filter"
     },
-    sudo_users = {175623013,0,tonumber(our_id)},--Sudo users
+    sudo_users = {175623013,152457798,169975536,tonumber(our_id)},--Sudo users
     moderation = {data = 'data/moderation.json'},
     about_text = [[ ]],
     help_text_realm = [[
