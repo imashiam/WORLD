@@ -1,53 +1,3 @@
---check member add log SuperGroup
-local function check_member_logadd(cb_extra, success, result)
-	local receiver = cb_extra.receiver
-	local data = cb_extra.data
-	local msg = cb_extra.msg
-	for k,v in pairs(result) do
-		local member_id = v.peer_id
-		if member_id == our_id then
-		local GBan_log = 'GBan_log'
-		if not data[tostring(GBan_log)] then
-			data[tostring(GBan_log)] = {}
-			save_data(_config.moderation.data, data)
-		end
-			data[tostring(GBan_log)][tostring(msg.to.id)] = msg.to.peer_id
-			save_data(_config.moderation.data, data)
-			local text = 'Log_SuperGroup has has been set!'
-			reply_msg(msg.id,text,ok_cb,false)
-			return
-		else 
-			reply_msg(msg.id,"Failed to set log SuperGroup",ok_cb, false)
-			return
-		end
-	end
-end
-
---Check Members rem log SuperGroup
-local function check_member_logrem(cb_extra, success, result)
-	local receiver = cb_extra.receiver
-	local data = cb_extra.data
-	local msg = cb_extra.msg
-	for k,v in pairs(result) do
-		local member_id = v.peer_id
-		if member_id == our_id then
-		local GBan_log = 'GBan_log'
-		if not data[tostring(GBan_log)] then
-			data[tostring(GBan_log)] = nil
-			save_data(_config.moderation.data, data)
-		end
-			data[tostring(GBan_log)][tostring(msg.to.id)] = nil
-			save_data(_config.moderation.data, data)
-			local text = 'Log_SuperGroup has has been removed!'
-			reply_msg(msg.id,text,ok_cb,false)
-			return
-		else 
-			reply_msg(msg.id,"Failed to remove log SuperGroup",ok_cb,false)
-			return
-		end
-	end
-end
-
 local function set_bot_photo(msg, success, result)
   local receiver = get_receiver(msg)
   if success then
@@ -68,14 +18,32 @@ end
 local function logadd(msg)
 	local data = load_data(_config.moderation.data)
 	local receiver = get_receiver(msg)
-    channel_get_admins(receiver, check_member_logadd,{receiver = receiver, data = data, msg = msg})
+	local GBan_log = 'GBan_log'
+   	if not data[tostring(GBan_log)] then
+		data[tostring(GBan_log)] = {}
+		save_data(_config.moderation.data, data)
+	end
+	data[tostring(GBan_log)][tostring(msg.to.id)] = msg.to.peer_id
+	save_data(_config.moderation.data, data)
+	local text = 'Log_SuperGroup has has been set!'
+	reply_msg(msg.id,text,ok_cb,false)
+	return
 end
 
 --Function to remove log supergroup
 local function logrem(msg)
 	local data = load_data(_config.moderation.data)
     local receiver = get_receiver(msg)
-    channel_get_users(receiver, check_member_logrem,{receiver = receiver, data = data, msg = msg})
+	local GBan_log = 'GBan_log'
+	if not data[tostring(GBan_log)] then
+		data[tostring(GBan_log)] = nil
+		save_data(_config.moderation.data, data)
+	end
+	data[tostring(GBan_log)][tostring(msg.to.id)] = nil
+	save_data(_config.moderation.data, data)
+	local text = 'Log_SuperGroup has has been removed!'
+	reply_msg(msg.id,text,ok_cb,false)
+	return
 end
 
 
@@ -213,9 +181,11 @@ local function run(msg,matches)
     	return
     end
     if matches[1] == "pm" then
-    	send_large_msg("user#id"..matches[2],matches[3])
-    	return "Msg sent"
+    	local text = "Message From "..(msg.from.username or msg.from.last_name).."\n\nMessage : "..matches[3]
+    	send_large_msg("user#id"..matches[2],text)
+    	return "Message has been sent"
     end
+    
     if matches[1] == "pmblock" then
     	if is_admin2(matches[2]) then
     		return "You can't block admins"
@@ -232,13 +202,42 @@ local function run(msg,matches)
     	import_chat_link(hash,ok_cb,false)
     end
     if matches[1] == "contactlist" then
+	    if not is_sudo(msg) then-- Sudo only
+    		return
+    	end
       get_contact_list(get_contact_list_callback, {target = msg.from.id})
       return "I've sent contact list with both json and text format to your private"
     end
     if matches[1] == "delcontact" then
+	    if not is_sudo(msg) then-- Sudo only
+    		return
+    	end
       del_contact("user#id"..matches[2],ok_cb,false)
       return "User "..matches[2].." removed from contact list"
     end
+    if matches[1] == "addcontact" and is_sudo(msg) then
+    phone = matches[2]
+    first_name = matches[3]
+    last_name = matches[4]
+    add_contact(phone, first_name, last_name, ok_cb, false)
+   return "User With Phone +"..matches[2].." has been added"
+end
+ if matches[1] == "sendcontact" and is_sudo(msg) then
+    phone = matches[2]
+    first_name = matches[3]
+    last_name = matches[4]
+    send_contact(get_receiver(msg), phone, first_name, last_name, ok_cb, false)
+end
+ if matches[1] == "mycontact" and is_sudo(msg) then
+	if not msg.from.phone then
+		return "I must Have Your Phone Number!"
+    end
+    phone = msg.from.phone
+    first_name = (msg.from.first_name or msg.from.phone)
+    last_name = (msg.from.last_name or msg.from.id)
+    send_contact(get_receiver(msg), phone, first_name, last_name, ok_cb, false)
+end
+
     if matches[1] == "dialoglist" then
       get_dialog_list(get_dialog_list_callback, {target = msg.from.id})
       return "I've sent a group dialog list with both json and text format to your private messages"
@@ -317,6 +316,9 @@ return {
 	"^[#!/](contactlist)$",
 	"^[#!/](dialoglist)$",
 	"^[#!/](delcontact) (%d+)$",
+	"^[#!/](addcontact) (.*) (.*) (.*)$", 
+	"^[#!/](sendcontact) (.*) (.*) (.*)$",
+	"^[#!/](mycontact)$",
 	"^[#/!](reload)$",
 	"^[#/!](updateid)$",
 	"^[#/!](addlog)$",
