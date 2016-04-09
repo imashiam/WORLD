@@ -947,56 +947,29 @@ local function run(msg, matches)
     end
   end
 if msg.to.type == 'chat' then
-  if is_admin1(msg) or not is_support(msg.from.id) then-- Admin only
-	  if matches[1] == 'add' and not matches[2] then
-		if not is_admin1(msg) or not is_support(msg.from.id) then-- Admin only
-			savelog(msg.to.id, name_log.." ["..msg.from.id.."] attempted to add group [ "..msg.to.id.." ]")
-			return
-		end
-		if is_realm(msg) then
-		   return 'Error: Already a realm.'
-		end
-		savelog(msg.to.id, name_log.." ["..msg.from.id.."] added group [ "..msg.to.id.." ]")
-		print("group "..msg.to.print_name.."("..msg.to.id..") added")
-		return modadd(msg)
-	  end
-	   if matches[1] == 'add' and matches[2] == 'realm' then
-		if not is_sudo(msg) then-- Admin only
-			savelog(msg.to.id, name_log.." ["..msg.from.id.."] attempted to add realm [ "..msg.to.id.." ]")
-			return
-		end
-		if is_group(msg) then
-		   return 'Error: Already a group.'
-		end
-		savelog(msg.to.id, name_log.." ["..msg.from.id.."] added realm [ "..msg.to.id.." ]")
-		print("group "..msg.to.print_name.."("..msg.to.id..") added as a realm")
-		return realmadd(msg)
-	  end
-	  if matches[1] == 'rem' and not matches[2] then
-		if not is_admin1(msg) or not is_support(msg.from.id) then-- Admin only
-			savelog(msg.to.id, name_log.." ["..msg.from.id.."] attempted to remove group [ "..msg.to.id.." ]")
-			return
-		end
-		if not is_group(msg) then
-		   return 'Error: Not a group.'
-		end
-		savelog(msg.to.id, name_log.." ["..msg.from.id.."] removed group [ "..msg.to.id.." ]")
-		print("group "..msg.to.print_name.."("..msg.to.id..") removed")
-		return modrem(msg)
-	  end
-	  if matches[1] == 'rem' and matches[2] == 'realm' then
-		if not is_sudo(msg) then-- Sudo only
-			savelog(msg.to.id, name_log.." ["..msg.from.id.."] attempted to remove realm [ "..msg.to.id.." ]")
-			return
-		end
-		if not is_realm(msg) then
-		   return 'Error: Not a realm.'
-		end
-		savelog(msg.to.id, name_log.." ["..msg.from.id.."] removed realm [ "..msg.to.id.." ]")
-		print("group "..msg.to.print_name.."("..msg.to.id..") removed as a realm")
-		return realmrem(msg)
-	  end
-	end
+
+  if matches[1] == 'add' and not matches[2] then
+     if is_realm(msg) then
+        return 'Error: Already a realm.'
+     end
+     print("group "..msg.to.print_name.."("..msg.to.id..") added")
+     return modadd(msg)
+    end
+    if matches[1] == 'add' and matches[2] == 'realm' then
+     if is_group(msg) then
+        return 'Error: Already a group.'
+     end
+     print("group "..msg.to.print_name.."("..msg.to.id..") added as a realm")
+     return realmadd(msg)
+   end
+   if matches[1] == 'rem' and not matches[2] then
+     print("group "..msg.to.print_name.."("..msg.to.id..") removed")
+     return modrem(msg)
+   end
+   if matches[1] == 'rem' and matches[2] == 'realm' then
+     print("group "..msg.to.print_name.."("..msg.to.id..") removed as a realm")
+     return realmrem(msg)
+   end
   if matches[1] == 'chat_created' and msg.from.id == 0 and group_type == "group" then
     return automodadd(msg)
   end
