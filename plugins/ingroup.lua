@@ -832,6 +832,7 @@ local function modlist(msg)
 end
 
 local function callbackres(extra, success, result)
+--vardump(result)
   local user = result.peer_id
   local name = string.gsub(result.print_name, "_", " ")
   local chat = 'chat#id'..extra.chatid
@@ -942,37 +943,37 @@ local function run(msg, matches)
    local name_log = user_print_name(msg.from)
   local group = msg.to.id
   if msg.media then
-    if msg.media.type == 'photo' and data[tostring(msg.to.id)] and data[tostring(msg.to.id)]['settings']['set_photo'] == 'waiting' and is_chat_msg(msg) and is_momod(msg) then
+    if msg.media.type == 'photo' and data[tostring(msg.to.id)]['settings']['set_photo'] == 'waiting' and is_chat_msg(msg) and is_momod(msg) then
       load_photo(msg.id, set_group_photo, msg)
     end
   end
 if msg.to.type == 'chat' then
-
   if matches[1] == 'add' and not matches[2] then
-     if is_realm(msg) then
-        return 'Error: Already a realm.'
-     end
-     print("group "..msg.to.print_name.."("..msg.to.id..") added")
-     return modadd(msg)
+    if is_realm(msg) then
+       return 'Error: Already a realm.'
     end
-    if matches[1] == 'add' and matches[2] == 'realm' then
-     if is_group(msg) then
-        return 'Error: Already a group.'
-     end
-     print("group "..msg.to.print_name.."("..msg.to.id..") added as a realm")
-     return realmadd(msg)
-   end
-   if matches[1] == 'rem' and not matches[2] then
-     print("group "..msg.to.print_name.."("..msg.to.id..") removed")
-     return modrem(msg)
-   end
-   if matches[1] == 'rem' and matches[2] == 'realm' then
-     print("group "..msg.to.print_name.."("..msg.to.id..") removed as a realm")
-     return realmrem(msg)
-   end
+    print("group "..msg.to.print_name.."("..msg.to.id..") added")
+    return modadd(msg)
+  end
+   if matches[1] == 'add' and matches[2] == 'realm' then
+    if is_group(msg) then
+       return 'Error: Already a group.'
+    end
+    print("group "..msg.to.print_name.."("..msg.to.id..") added as a realm")
+    return realmadd(msg)
+  end
+  if matches[1] == 'rem' and not matches[2] then
+    print("group "..msg.to.print_name.."("..msg.to.id..") removed")
+    return modrem(msg)
+  end
+  if matches[1] == 'rem' and matches[2] == 'realm' then
+    print("group "..msg.to.print_name.."("..msg.to.id..") removed as a realm")
+    return realmrem(msg)
+  end
   if matches[1] == 'chat_created' and msg.from.id == 0 and group_type == "group" then
     return automodadd(msg)
   end
+  
  --[[Experimental
   if matches[1] == 'chat_created' and msg.from.id == 0 and group_type == "super_group" then
 	local chat_id = get_receiver(msg)
@@ -982,6 +983,7 @@ if msg.to.type == 'chat' then
 		end
 	--chat_upgrade(chat_id, ok_cb, false)
   end ]]
+
   if matches[1] == 'chat_created' and msg.from.id == 0 and group_type == "realm" then
     return autorealmadd(msg)
   end
