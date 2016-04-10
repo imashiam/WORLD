@@ -10,8 +10,6 @@ if is_chat_msg(msg) or is_super_group(msg) then
 	local to_chat = msg.to.type == 'chat'
 	if data[tostring(msg.to.id)] and data[tostring(msg.to.id)]['settings'] then
 		settings = data[tostring(msg.to.id)]['settings']
-	else
-		return
 	end
 	if settings.lock_arabic then
 		lock_arabic = settings.lock_arabic
@@ -22,11 +20,6 @@ if is_chat_msg(msg) or is_super_group(msg) then
 		lock_rtl = settings.lock_rtl
 	else
 		lock_rtl = 'no'
-	end
-		if settings.lock_tgservice then
-		lock_tgservice = settings.lock_tgservice
-	else
-		lock_tgservice = 'no'
 	end
 	if settings.lock_link then
 		lock_link = settings.lock_link
@@ -81,15 +74,7 @@ if is_chat_msg(msg) or is_super_group(msg) then
 				if strict == "yes" or to_chat then
 					kick_user(msg.from.id, msg.to.id)
 				end
-		end
-		if msg.service then 
-			if lock_tgservice == "yes" then
-				delete_msg(msg.id, ok_cb, false)
-				if to_chat then
-					return
-				end
 			end
-		end
 			local is_squig_msg = msg.text:match("[\216-\219][\128-\191]")
 			if is_squig_msg and lock_arabic == "yes" then
 				delete_msg(msg.id, ok_cb, false)
