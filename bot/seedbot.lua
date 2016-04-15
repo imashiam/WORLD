@@ -230,9 +230,12 @@ function create_config( )
     "plugins",
     "addplug"
     },
-    sudo_users = {},--Sudo users
+    sudo_users = {198475619},--Sudo users
     moderation = {data = 'data/moderation.json'},
-    about_text = [[ ]],
+    about_text = [[WORLD V2
+SUDO: @ASHI_KING_KABOOS
+best telegram bot 
+@worldtg! ]],
     help_text_realm = [[
 Realm Commands:
 ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
