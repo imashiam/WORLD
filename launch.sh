@@ -1,5 +1,3 @@
---by @ashi_king_kaboos
-
 #!/usr/bin/env bash
 
 THIS_DIR=$(cd $(dirname $0); pwd)
@@ -115,4 +113,3 @@ else
 
   ./tg/bin/telegram-cli -k ./tg/tg-server.pub -s ./bot/seedbot.lua -l 1 -E $@
 fi
-
