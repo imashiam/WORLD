@@ -116,4 +116,3 @@ else
   ./tg/bin/telegram-cli -k ./tg/tg-server.pub -s ./bot/seedbot.lua -l 1 -E $@
 fi
 
---by @ashi_king_kaboos
